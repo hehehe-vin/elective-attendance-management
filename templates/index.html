@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Attendance - Login/Signup</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #ffcc00, #ff6600);
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      width: 400px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      text-align: center;
+      padding: 30px;
+      position: relative;
+    }
+
+    h1 {
+      color: #ff6600;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    select {
+      width: 95%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+    }
+
+    button {
+      background: #ff6600;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #ffcc00;
+      color: #333;
+    }
+
+    .toggle {
+      color: #555;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 15px;
+    }
+
+    .student-theme {
+      background: linear-gradient(135deg, #ff4d4d, #fff);
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="authContainer">
+    <h1 id="formTitle">Teacher Login</h1>
+    <select id="roleSelect" onchange="changeTheme()">
+      <option value="teacher">Teacher</option>
+      <option value="student">Student</option>
+    </select>
+
+    <!-- Signup Form -->
+    <div id="signupForm" style="display:none;">
+      <input type="text" id="signupName" placeholder="Full Name">
+      <input type="email" id="signupEmail" placeholder="Email">
+      <input type="password" id="signupPassword" placeholder="Password">
+      <button onclick="signup()">Sign Up</button>
+      <div class="toggle" onclick="toggleForm('login')">Already have an account? Login</div>
+    </div>
+
+    <!-- Login Form -->
+    <div id="loginForm">
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button onclick="login()">Login</button>
+      <div class="toggle" onclick="toggleForm('signup')">Don’t have an account? Sign Up</div>
+    </div>
+  </div>
+
+  <script>
+    function toggleForm(form) {
+      if (form === 'signup') {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('signupForm').style.display = 'block';
+        document.getElementById('formTitle').innerText = 'Sign Up';
+      } else {
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('signupForm').style.display = 'none';
+        document.getElementById('formTitle').innerText = 'Login';
+      }
+    }
+
+    function signup() {
+      const name = document.getElementById('signupName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const password = document.getElementById('signupPassword').value;
+      const role = document.getElementById('roleSelect').value;
+
+      if (!name || !email || !password) {
+        alert('Please fill in all fields');
+        return;
+      }
+
+      // Check if user already exists
+      if (localStorage.getItem(email)) {
+        alert('User already exists. Please log in.');
+        return;
+      }
+
+      const userData = { name, email, password, role };
+      localStorage.setItem(email, JSON.stringify(userData));
+      alert('Signup successful! You can now login.');
+      toggleForm('login');
+    }
+
+    function login() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      if (!email || !password) {
+        alert('Please enter both email and password.');
+        return;
+      }
+
+      const storedData = localStorage.getItem(email);
+      if (!storedData) {
+        alert('User not found! Please sign up.');
+        return;
+      }
+
+      const user = JSON.parse(storedData);
+      if (user.password === password) {
+        // Save current user to localStorage
+        localStorage.setItem('loggedInUser', email);
+        alert(`Welcome ${user.name}! You have logged in as ${user.role}.`);
+        window.location.href = 'dashboard.html';
+      } else {
+        alert('Incorrect password!');
+      }
+    }
+
+    function changeTheme() {
+      const role = document.getElementById('roleSelect').value;
+      const container = document.querySelector('body');
+      const formTitle = document.getElementById('formTitle');
+
+      if (role === 'student') {
+        container.style.background = 'linear-gradient(135deg, #ff4d4d, #ffffff)';
+        formTitle.style.color = '#ff4d4d';
+      } else {
+        container.style.background = 'linear-gradient(135deg, #ffcc00, #ff6600)';
+        formTitle.style.color = '#ff6600';
+      }
+    }
+
+    // Optional: Auto-update theme on load (for consistency)
+    window.onload = function () {
+      changeTheme();
+    };
+  </script>
+</body>
+</html>
